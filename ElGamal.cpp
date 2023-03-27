@@ -11,7 +11,7 @@
 #include <ctime>
 #include <math.h>
 #include <bitset>
-#include "infint/InfInt.h"
+#include "infint_lib/InfInt.h"
 
 //#define INFINT_USE_EXCEPTIONS
 using namespace std;
