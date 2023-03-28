@@ -15,58 +15,76 @@
 
 //#define INFINT_USE_EXCEPTIONS
 using namespace std;
-/*
-InfInt binToDec(string binStr) {
-    InfInt dec = 0;
-    for(InfInt i = 0; i < binStr.length(); i++){
-        int j = i.toInt();
-        InfInt base = 2;
-        dec += (pow(base,i) * binStr[j]).toString();
+//Algorithm to convert binary string to decimal value. taken from https://www.geeksforgeeks.org/program-binary-decimal-conversion/
+InfInt binaryToDecimal(string n)
+{
+    string num = n;
+    InfInt dec_value = 0;
+ 
+    // Initializing base value to 1, i.e 2^0
+    InfInt base = 1;
+ 
+    int len = num.length();
+    for (int i = len - 1; i >= 0; i--) {
+        if (num[i] == '1')
+            dec_value += base;
+        base = base * 2;
     }
-    return dec;
+ 
+    return dec_value;
 }
- */
-// InfInt randomGenerator(int bitsize){
-//     srand((unsigned) time(0));
-//     int numDigits = (bitsize + 3) / 4;  // each digit represents 4 bits
-//     string randomNumber = "";
-//     for(int i = 0; i < numDigits; i++){
-//         randomNumber += to_string(rand() % 10);
-//     }
-//     InfInt rand = randomNumber;
-//     return rand;
-// }
+//overloding power function that works with big integers
+InfInt pow(InfInt base, InfInt exponent){
+    InfInt power = 1;
+    for(InfInt i = 0; i < exponent; i++){
+        power *= base;
+    }
+    return power;
+}
 
+//convert a decimal to its binary form in reverse order
+string RevDecToBin (InfInt n){
+
+    string binary = "";
+    int i = 0;
+    while(n > 0){
+        binary += (n % 2).toString();
+        n = n / 2;
+        i++;
+    }
+    return binary;
+}
+string DecToBin (InfInt n){
+
+    string binary = "";
+    int i = 0;
+    while(n > 0){
+        binary = (n % 2).toString() + binary;
+        n = n / 2;
+        i++;
+    }
+    return binary;
+}
+
+//Generate N bit binary string and uses binaryToDecimal(string n) to returns its decimal value
 InfInt randomGenerator(int bitsize){
     srand(time(NULL));
-    string randomNumber = "";
+    string randomNumber = "1";
     
-    while(randomNumber.length() < bitsize){
-        randomNumber += to_string(rand() % 2);
-        cout << randomNumber.length() << endl;
+    for (int i = 0; i < bitsize-1; i++){
+        int num = ((int)rand() % 2);
+        randomNumber += to_string(num);
+        //cout << randomNumber.length() << endl;
     }
-    //InfInt number_string = binToDec(randomNumber);
-    cout << randomNumber << endl;
-    return randomNumber;
+    InfInt number_string = binaryToDecimal(randomNumber);
+    //cout << randomNumber << endl;
+    return number_string;
 }
-int randomGenerator(InfInt upperBound, InfInt lowerBound){
-    srand((unsigned) time(0));
-    int randomNumber = 0;
-    int upper = 0;
-    int lower = 0;
-        int random = rand();
-        
-        if(upperBound < 32767){
-            upper = upperBound.toInt();
-            lower = lowerBound.toInt();
-            randomNumber = (random % (upper - lower + 1) + lower);
-        }
-        else if (upperBound > 32767){
-            upper = 32767;
-            lower = lowerBound.toInt();
-            randomNumber = (random % (upper - lower + 1) + lower);
-        }
-    //int rand = stoi(randomNumber);
+InfInt randomGenerator(InfInt upperBound, InfInt lowerBound){
+    InfInt randomNumber = "0";
+
+    InfInt random = randomGenerator(DecToBin(upperBound).length() - 1);
+    randomNumber = (random % (upperBound - lowerBound + 1) + lowerBound);
     return randomNumber;
 }
 
@@ -101,29 +119,12 @@ void asciiToSentence(string str, int len)
         }
     }
 }
-
+/*
 string convertToText(InfInt number){
     
 }
 
-InfInt pow(InfInt base, InfInt exponent){
-    InfInt power = 1;
-    for(InfInt i = 0; i < exponent; i++){
-        power *= base;
-    }
-    return power;
-}
-string RevDecToBin (InfInt n){
-
-    string binary = "";
-    int i = 0;
-    while(n > 0){
-        binary += (n % 2).toString();
-        n = n / 2;
-        i++;
-    }
-    return binary;
-}
+*/
 
 //needs to get int from user and convert to string
 InfInt SquareAndMultiply(InfInt base, InfInt exponent, InfInt modulus){
@@ -150,26 +151,14 @@ bool millerRabin(InfInt oddInt, int bitsize){
     InfInt r = 0;
     InfInt n = oddInt - 1;
     InfInt t = 0;
-    if(bitsize == 32){
-        t = 30;
-    }
-    else if(bitsize == 64){
+    if(bitsize <= 64){
         t = 100;
     }
-    else if(bitsize == 128){
+    else if(bitsize <= 256){
         t = 300;
     }
-    else if(bitsize == 256){
-        t = 500;
-    }
-    else if(bitsize == 512){
-        t = 700;
-    }
-    else if(bitsize == 768){
-        t = 700;
-    }
     else{
-        t = 800;
+        t = 300;
     }
     while(n % 2 == 0){
         n /= 2;
@@ -202,22 +191,32 @@ InfInt PrimeNumberGenerator(int bitsize){
     }while(millerRabin(oddInt, bitsize) == 0);
     return oddInt;
 }
-    
-    //return prime;
-//}
-int main (){
-    //Testing Square and Multi
-    InfInt base = 5853;
-    InfInt exponent = 583374743;
-    InfInt modulus = "12038821957852645118633071039078919431279167079850496265189354163801320807095724585390948367751175965727677176252712389699346980318553819523587359943199237";
-    //InfInt mod = SquareAndMultiply(base, exponent, modulus);
-    //cout << mod;
+/*
+InfInt alphaGenerator(InfInt upperBound, InfInt lowerBound){
+    InfInt randomNumber = "0";
 
-    //Testing Miller Rabin
-    InfInt oddInt = "14696103859734266881";
-    InfInt t = 64;
-    InfInt prime = randomGenerator(64);
-    cout << prime;
+    InfInt random = randomGenerator(DecToBin(upperBound).length() - 1);
+    randomNumber = (random % (upperBound - lowerBound + 1) + lowerBound);
+    cout << random << endl;
+    return randomNumber;
+}
+    */
+char* whatIsTheTime(){
+    time_t now = time(0);
+    char* date_time = ctime(&now);
+
+    return date_time;
+}
+int main (){
+    //start time
+    cout << "start time: " << whatIsTheTime() << endl;
+
+    InfInt p = "10";
+    InfInt q = "1";
+    cout << PrimeNumberGenerator(256) << endl;
+    
+    //End time
+    cout << endl << "end time: " << whatIsTheTime();
 
     return 0;
 }
