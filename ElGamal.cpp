@@ -13,8 +13,22 @@
 #include <bitset>
 #include "infint_lib/InfInt.h"
 
+InfInt p = "0";
+InfInt alpha = "0";
+InfInt alpha_pow_key = "0";
+InfInt a = "0";
+InfInt gamma = "0";
+InfInt delta = "0";
+
 //#define INFINT_USE_EXCEPTIONS
 using namespace std;
+
+char* whatIsTheTime(){
+    time_t now = time(0);
+    char* date_time = ctime(&now);
+
+    return date_time;
+}
 //Algorithm to convert binary string to decimal value. taken from https://www.geeksforgeeks.org/program-binary-decimal-conversion/
 InfInt binaryToDecimal(string n)
 {
@@ -150,20 +164,8 @@ bool millerRabin(InfInt oddInt, int bitsize){
     InfInt s = 0;
     InfInt r = 0;
     InfInt n = oddInt - 1;
-    InfInt t = 0;
-    if(bitsize <= 64){
-        t = 100;
-    }
-    else if(bitsize <= 256){
-        t = 300;
-    }
-    else{
-        t = 300;
-    }
-    while(n % 2 == 0){
-        n /= 2;
-        s++;
-    }
+    InfInt t = 50;
+
     r = n;
  for(InfInt i = 1; i < t; i++){
         InfInt a = randomGenerator(oddInt - 2, 2); //will be a random interger
@@ -191,30 +193,44 @@ InfInt PrimeNumberGenerator(int bitsize){
     }while(millerRabin(oddInt, bitsize) == 0);
     return oddInt;
 }
+ /*
+void PublicKeyGenreation(int bitsize){
+    p = PrimeNumberGenerator(bitsize);
+    alpha = 
+}
+*/
+void encryption(int bitsize){
+    cout << "start time: " << whatIsTheTime() << endl;
+    p = PrimeNumberGenerator(bitsize);
+    string message = "hello this is my message";
+    InfInt messageNum = convertToASCII(message); // range of {0 till p-1}
+    alpha = randomGenerator(p - 1, 1);
+    a = randomGenerator(p-2,1);
+    InfInt k = randomGenerator(p - 1,1);   //random interger between 1 and p-2
+    gamma = SquareAndMultiply(alpha, k, p);   // compute gamma = alpa ^ k mod p 
+    alpha_pow_key = SquareAndMultiply(alpha, a, p);
+    delta = messageNum * SquareAndMultiply(alpha_pow_key, k, p); // compute delta = message * (alpa ^ a)^k mod p 
+    // return ciphertext which is gamma and delta 
+}
 /*
-InfInt alphaGenerator(InfInt upperBound, InfInt lowerBound){
-    InfInt randomNumber = "0";
-
-    InfInt random = randomGenerator(DecToBin(upperBound).length() - 1);
-    randomNumber = (random % (upperBound - lowerBound + 1) + lowerBound);
-    cout << random << endl;
-    return randomNumber;
+void decryption(){
+    // recover m : gamma ^ negative of a * delta mod p 
+    // return plaintext 
 }
-    */
-char* whatIsTheTime(){
-    time_t now = time(0);
-    char* date_time = ctime(&now);
+*/
 
-    return date_time;
-}
 int main (){
     //start time
-    cout << "start time: " << whatIsTheTime() << endl;
-
-    InfInt p = "10";
-    InfInt q = "1";
-    cout << PrimeNumberGenerator(256) << endl;
     
+
+    //InfInt p = PrimeNumberGenerator(32);
+    //InfInt q = "1";
+    //cout << PrimeNumberGenerator(256) << endl;
+    //PublicKeyGenreation();
+    //cout << p;
+    
+    encryption(32);
+    cout << "Ciphertext is Gamma: " << gamma << "plus Delta: " << delta;
     //End time
     cout << endl << "end time: " << whatIsTheTime();
 
