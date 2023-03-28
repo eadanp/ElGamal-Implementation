@@ -13,22 +13,24 @@
 #include <bitset>
 #include "infint_lib/InfInt.h"
 
+//Initializing Private and Public Key Variable
 InfInt p = "0";
 InfInt alpha = "0";
 InfInt alpha_pow_key = "0";
 InfInt a = "0";
-InfInt gamma = "0";
+InfInt gammma = "0";
 InfInt delta = "0";
 
-//#define INFINT_USE_EXCEPTIONS
 using namespace std;
 
+//Function to get current time
 char* whatIsTheTime(){
     time_t now = time(0);
     char* date_time = ctime(&now);
 
     return date_time;
 }
+
 //Algorithm to convert binary string to decimal value. taken from https://www.geeksforgeeks.org/program-binary-decimal-conversion/
 InfInt binaryToDecimal(string n)
 {
@@ -47,7 +49,8 @@ InfInt binaryToDecimal(string n)
  
     return dec_value;
 }
-//overloding power function that works with big integers
+
+//Function that overloads the power function in the math.h library so that works with big integers
 InfInt pow(InfInt base, InfInt exponent){
     InfInt power = 1;
     for(InfInt i = 0; i < exponent; i++){
@@ -56,7 +59,7 @@ InfInt pow(InfInt base, InfInt exponent){
     return power;
 }
 
-//convert a decimal to its binary form in reverse order
+//Function for converting a decimal to its binary form in reverse order
 string RevDecToBin (InfInt n){
 
     string binary = "";
@@ -68,6 +71,8 @@ string RevDecToBin (InfInt n){
     }
     return binary;
 }
+
+//Function for converting a decimal to its binary form 
 string DecToBin (InfInt n){
 
     string binary = "";
@@ -80,7 +85,7 @@ string DecToBin (InfInt n){
     return binary;
 }
 
-//Generate N bit binary string and uses binaryToDecimal(string n) to returns its decimal value
+//Function for generating N bit binary string and uses binaryToDecimal(string n) to returns its decimal value
 InfInt randomGenerator(int bitsize){
     srand(time(NULL));
     string randomNumber = "1";
@@ -94,6 +99,8 @@ InfInt randomGenerator(int bitsize){
     //cout << randomNumber << endl;
     return number_string;
 }
+
+//Function that overloads randomGenerator to create upper and lower bounds
 InfInt randomGenerator(InfInt upperBound, InfInt lowerBound){
     InfInt randomNumber = "0";
 
@@ -102,6 +109,7 @@ InfInt randomGenerator(InfInt upperBound, InfInt lowerBound){
     return randomNumber;
 }
 
+//Function for converting text to ascii
 InfInt convertToASCII(string text)
 {
     string result = "";
@@ -113,34 +121,33 @@ InfInt convertToASCII(string text)
     InfInt number = result;
     return number;
 }
-void asciiToSentence(string str, int len)
+
+//Function for converting ascii to text
+string asciiToText(InfInt number)
 {
     int num = 0;
-    for (int i = 0; i < len; i++) {
+    string text = "";
+    string n = number.toString();
+    for (int i = 0; i < n.length(); i++) {
  
         // Append the current digit
-        num = num * 10 + (str[i] - '0');
+        num = num * 10 + (n[i] - '0');
  
         // If num is within the required range
         if (num >= 32 && num <= 122) {
  
             // Convert num to char
             char ch = (char)num;
-            cout << ch;
+            text += ch;
  
             // Reset num to 0
             num = 0;
         }
     }
-}
-/*
-string convertToText(InfInt number){
-    
+    return text;
 }
 
-*/
-
-//needs to get int from user and convert to string
+//Function to perform modular exponentiation using the "Square And Multiply" aproach
 InfInt SquareAndMultiply(InfInt base, InfInt exponent, InfInt modulus){
     string binary_exponent = RevDecToBin(exponent);
     InfInt b = 1;
@@ -160,7 +167,8 @@ InfInt SquareAndMultiply(InfInt base, InfInt exponent, InfInt modulus){
    return b;
 }
 
-bool millerRabin(InfInt oddInt, int bitsize){
+//Function to perform a Miller-Rabin primality test on an integer
+bool millerRabin(InfInt oddInt){
     InfInt s = 0;
     InfInt r = 0;
     InfInt n = oddInt - 1;
@@ -186,38 +194,45 @@ bool millerRabin(InfInt oddInt, int bitsize){
     }
  return true;
 }
+
+//Function to generate a random prime number of N bit 
 InfInt PrimeNumberGenerator(int bitsize){
     InfInt oddInt = "";
     do{
         oddInt = randomGenerator(bitsize);
-    }while(millerRabin(oddInt, bitsize) == 0);
+    }while(millerRabin(oddInt) == 0);
     return oddInt;
 }
- /*
-void PublicKeyGenreation(int bitsize){
-    p = PrimeNumberGenerator(bitsize);
-    alpha = 
-}
-*/
-void encryption(int bitsize){
+
+//Function for encrypting a message with a N size bit key
+void encryption(int bitsize, string message){
     cout << "start time: " << whatIsTheTime() << endl;
+    
     p = PrimeNumberGenerator(bitsize);
-    string message = "hello this is my message";
-    InfInt messageNum = convertToASCII(message); // range of {0 till p-1}
-    alpha = randomGenerator(p - 1, 1);
+    cout << endl << "p: " << p << endl;
     a = randomGenerator(p-2,1);
-    InfInt k = randomGenerator(p - 1,1);   //random interger between 1 and p-2
-    gamma = SquareAndMultiply(alpha, k, p);   // compute gamma = alpa ^ k mod p 
+    alpha = randomGenerator(p - 1, 1);
     alpha_pow_key = SquareAndMultiply(alpha, a, p);
-    delta = messageNum * SquareAndMultiply(alpha_pow_key, k, p); // compute delta = message * (alpa ^ a)^k mod p 
+    InfInt k = randomGenerator(p - 1,1); //random interger between 1 and p-2
+    
+    InfInt messageNum = convertToASCII(message); // range of {0 till p-1}
+    cout << endl << messageNum << endl;
+    
+    gammma = SquareAndMultiply(alpha, k, p); // compute gamma = alpa ^ k mod p 
+    
+    delta = (messageNum * SquareAndMultiply(alpha_pow_key, k, p)) % p; // compute delta = message * (alpa ^ a)^k mod p 
+
     // return ciphertext which is gamma and delta 
 }
-/*
-void decryption(){
+
+//Function for decryption
+InfInt decryption(){
+    InfInt message = (delta * SquareAndMultiply(gammma, p-1-a, p)) % p;
+    return message;
     // recover m : gamma ^ negative of a * delta mod p 
     // return plaintext 
 }
-*/
+
 
 int main (){
     //start time
@@ -229,10 +244,12 @@ int main (){
     //PublicKeyGenreation();
     //cout << p;
     
-    encryption(32);
-    cout << "Ciphertext is Gamma: " << gamma << "plus Delta: " << delta;
+    //encryption(64);
+    //cout << "Ciphertext is Gamma: " << gammma << " plus Delta: " << delta << endl;
+    //cout << decryption();
     //End time
-    cout << endl << "end time: " << whatIsTheTime();
-
+    //cout << endl << "end time: " << whatIsTheTime();
+    //cout << asciiToText(104101108108111);
+    //string decMessage = asciiToSentence(message, message.length());
     return 0;
 }
