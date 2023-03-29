@@ -5,13 +5,8 @@
 *
 * Description: ElGamal Public-Key Encryption implememtation
 */
-#include <iostream>
-#include <string>
-#include <cstdlib>
-#include <ctime>
-#include <math.h>
-#include <bitset>
-#include "infint_lib/InfInt.h"
+
+#include "ElGamal.h"
 
 //Initializing Private and Public Key Variable
 InfInt p = "0";
@@ -21,7 +16,7 @@ InfInt a = "0";
 InfInt gammma = "0";
 InfInt delta = "0";
 
-using namespace std;
+
 
 //Function to get current time
 char* whatIsTheTime(){
@@ -146,7 +141,6 @@ string asciiToText(InfInt number)
     }
     return text;
 }
-
 //Function to perform modular exponentiation using the "Square And Multiply" aproach
 InfInt SquareAndMultiply(InfInt base, InfInt exponent, InfInt modulus){
     string binary_exponent = RevDecToBin(exponent);
@@ -206,50 +200,36 @@ InfInt PrimeNumberGenerator(int bitsize){
 
 //Function for encrypting a message with a N size bit key
 void encryption(int bitsize, string message){
+    cout << "The message you entered is: " << message << endl;
     cout << "start time: " << whatIsTheTime() << endl;
-    
     p = PrimeNumberGenerator(bitsize);
-    cout << endl << "p: " << p << endl;
+    cout << "Prime Number: " << p << endl;
+    cout << endl << "end time: " << whatIsTheTime() << endl;
     a = randomGenerator(p-2,1);
+    cout << "Your private key is: " << a << endl;
     alpha = randomGenerator(p - 1, 1);
     alpha_pow_key = SquareAndMultiply(alpha, a, p);
     InfInt k = randomGenerator(p - 1,1); //random interger between 1 and p-2
     
     InfInt messageNum = convertToASCII(message); // range of {0 till p-1}
-    cout << endl << messageNum << endl;
+    
     
     gammma = SquareAndMultiply(alpha, k, p); // compute gamma = alpa ^ k mod p 
     
     delta = (messageNum * SquareAndMultiply(alpha_pow_key, k, p)) % p; // compute delta = message * (alpa ^ a)^k mod p 
 
+
     // return ciphertext which is gamma and delta 
 }
 
 //Function for decryption
-InfInt decryption(){
+void decryption(){
     InfInt message = (delta * SquareAndMultiply(gammma, p-1-a, p)) % p;
-    return message;
+    cout << endl << "This is the message in decimal format: " << message << endl;
+    string textMessage = asciiToText(message);
+    cout << endl << "Your decrypted message is: " << textMessage << endl;
     // recover m : gamma ^ negative of a * delta mod p 
     // return plaintext 
 }
 
 
-int main (){
-    //start time
-    
-
-    //InfInt p = PrimeNumberGenerator(32);
-    //InfInt q = "1";
-    //cout << PrimeNumberGenerator(256) << endl;
-    //PublicKeyGenreation();
-    //cout << p;
-    
-    //encryption(64);
-    //cout << "Ciphertext is Gamma: " << gammma << " plus Delta: " << delta << endl;
-    //cout << decryption();
-    //End time
-    //cout << endl << "end time: " << whatIsTheTime();
-    //cout << asciiToText(104101108108111);
-    //string decMessage = asciiToSentence(message, message.length());
-    return 0;
-}
