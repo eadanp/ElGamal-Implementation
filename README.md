@@ -13,8 +13,8 @@ Encryption: The user will input a secret message to be encrypted and the bitsize
 
 The output will show the prime number, private key, and cyphertext (**gamma and delta**).
 
-Decryption: The user will input the prime number, private key, gamma and delta in order to decrypt the message 
-the output will be the message in decimal and text format
+Decryption: The user will input the prime number, private key, gamma and delta in order to decrypt the message.
+The output will be the message in decimal and text format
 
 **To run the program through VSCode make sure you have a G++ compiler.**
 
